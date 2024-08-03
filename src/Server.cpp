@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
 
-bool contains_alphanumeric(std::string& input_line) {
+bool contains_alphanumeric(std::string input_line) {
 	for(char c : input_line) {
-	    if(!( (c <= '0' && c >= '9') || (c <= 'A' && c >= 'Z') || (c <= 'a' && c >= 'z') || (c == ' ')))
-	        return false; 
+	    if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == ' '))
+	        return true; 
 	}
 
-	return true;
+	return false;
 }
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
