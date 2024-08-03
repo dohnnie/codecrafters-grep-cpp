@@ -3,7 +3,7 @@
 
 bool contains_alphanumeric(std::string& input_line) {
 	for(char c : input_line) {
-	    if(!( (c <= '0' && c >= '9') || (c <= 'A' && c >= 'Z') || (c <= 'a' && c >= 'z') || (c == ' '))
+	    if(!( (c <= '0' && c >= '9') || (c <= 'A' && c >= 'Z') || (c <= 'a' && c >= 'z') || (c == ' ')))
 	        return false; 
 	}
 
