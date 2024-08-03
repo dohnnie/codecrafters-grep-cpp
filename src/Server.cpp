@@ -20,6 +20,18 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     else if(pattern == "\\w") {
     	return contains_alphanumeric(input_line);
     }
+    else if(pattern[0] == '[') {
+    	int index = 1;
+        char c = pattern[index];
+	    std::string plus_char = "";
+
+	    while(c != ']') {
+            plus_char += c;
+            c = pattern[index++];
+	    }
+
+        return input_line.find_first_of(plus_char) != std::string::npos;
+    }
     else {
         throw std::runtime_error("Unhandled pattern " + pattern);
     }
