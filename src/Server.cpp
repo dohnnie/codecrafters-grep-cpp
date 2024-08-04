@@ -25,10 +25,16 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
         char c = pattern[index];
 	    std::string plus_char = "";
 
+        if(pattern[1] == '^')
+            index++;
+
 	    while(c != ']') {
             plus_char += c;
             c = pattern[index++];
 	    }
+
+        if(pattern[1] == '^')
+            return !(input_line.find_first_of(plus_char) != std::string::npos);
 
         return input_line.find_first_of(plus_char) != std::string::npos;
     }
