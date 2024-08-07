@@ -1,24 +1,53 @@
 #include <iostream>
 #include <string>
 
-bool contains_alphanumeric(std::string input_line) {
-	for(char c : input_line) {
-	    if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == ' '))
+bool contains_char(const char c, const char flag) {
+    //for numbers
+    if(flag == 'd') {
+        if( (c >= '0') && (c <= '9'))
+            return true;
+    }
+    //for alphanumeric characters
+    else if(flag == 'w') {
+        if((c >= '0' && c <= '9') || (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c == ' '))
 	        return true; 
-	}
+    }
 
-	return false;
+    return false;
+}
+
+bool match_char(const char* text, const char *regexp) {
+    if(*regexp == '\0') return 1;
+
+    if(text[0] == '\0') return 0;
+    
+    if(regexp[0] == '\\' && regexp[1] != '\0') {
+        if(contains_char(text[0], regexp[1])) return match_char(text + 1, regexp + 2);
+    }
+    
+    if(text[0] == regexp[0])
+        return match_char(text + 1, regexp + 1);
+
+    return match_char(text + 1, &regexp[0]);
+}
+
+bool match(const char* text, const char *regexp) {
+
+    if(regexp[0] == '\0')
+        return false;
+    else if(regexp[0] == '\\') {
+        return match_char(text, regexp);
+    }
+
+    return false;
 }
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
         return input_line.find(pattern) != std::string::npos;
     }
-    else if(pattern == "\\d") {
-    	return input_line.find_first_of("0123456789") != std::string::npos;
-    }
-    else if(pattern == "\\w") {
-    	return contains_alphanumeric(input_line);
+    else if(pattern[0] == '\\') {
+        return match(&input_line[0], &pattern[0]);
     }
     else if(pattern[0] == '[') {
     	int index = 1;
