@@ -75,6 +75,14 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
 
         return true;
     }
+    else if(pattern[pattern.length() - 1] == '$') {
+        for(int i = input_line.length() - 1; i >= 0; --i) {
+            if(input_line[i] != pattern[i])
+                return false;
+        }
+
+        return true;
+    }
     else {
         throw std::runtime_error("Unhandled pattern " + pattern);
     }
