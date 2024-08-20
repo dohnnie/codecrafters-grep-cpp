@@ -25,11 +25,10 @@ bool match_char(const char* text, const char *regexp) {
         if(contains_char(text[0], regexp[1])) return match_char(text + 1, regexp + 2);
     }
 
-    if(regexp[1] == '+') {
-        if(regexp[0] != text[0]) {
-            return match_char(text, regexp + 2);
-        }
-        
+    if(*regexp == *text && regexp[1] == '+') {
+        if(text[0] != text[1])
+            return match_char(text + 1,regexp + 2);
+
         return match_char(text + 1, regexp);
     }
     
@@ -56,8 +55,13 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     if (pattern.length() == 1) {
         return input_line.find(pattern) != std::string::npos;
     }
-    else if(pattern[0] == '\\') {
-        return match(&input_line[0], &pattern[0]);
+    else if(pattern[pattern.length() - 1] == '$') {
+        for(int i = input_line.length() - 1; i >= 0; --i) {
+            if(input_line[i] != pattern[i])
+                return false;
+        }
+
+        return true;
     }
     else if(pattern[0] == '[') {
     	int index = 1;
@@ -85,13 +89,8 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
 
         return true;
     }
-    else if(pattern[pattern.length() - 1] == '$') {
-        for(int i = input_line.length() - 1; i >= 0; --i) {
-            if(input_line[i] != pattern[i])
-                return false;
-        }
-
-        return true;
+    else if(pattern[0] == '\\' || contains_char(pattern[0], 'w')) {
+        return match(&input_line[0], &pattern[0]);
     }
     else {
         throw std::runtime_error("Unhandled pattern " + pattern);
