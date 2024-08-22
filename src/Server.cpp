@@ -20,6 +20,7 @@ bool contains_match_op(const std::string regex) {
     for(int i = 0; i < regex.length(); ++i) {
         if(regex[i] == '?') return true;
         else if(regex[i] == '+') return true;
+        else if(regex[i] == '.') return true;
     }
 
     return false;
@@ -46,6 +47,10 @@ bool match_char(const char* text, const char *regexp) {
 
         return match_char(text + 1, regexp + 2);
     }
+
+    if(*regexp == '.') {
+        return match_char(text + 1, regexp + 1);
+    }
     
     if(text[0] == regexp[0])
         return match_char(text + 1, regexp + 1);
@@ -62,8 +67,6 @@ bool match(const char* text, const char *regexp) {
 }
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
-    int opt_qnt;
-
     if (pattern.length() == 1) {
         return input_line.find(pattern) != std::string::npos;
     }
