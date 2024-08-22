@@ -16,10 +16,19 @@ bool contains_char(const char c, const char flag) {
     return false;
 }
 
-bool match_char(const char* text, const char *regexp) {
-    if(*regexp == '\0') return 1;
+bool contains_match_op(const std::string regex) {
+    for(int i = 0; i < regex.length(); ++i) {
+        if(regex[i] == '?') return true;
+        else if(regex[i] == '+') return true;
+    }
 
-    if(text[0] == '\0') return 0;
+    return false;
+}
+
+bool match_char(const char* text, const char *regexp) {
+    if(*regexp == '\0') return true;
+
+    if(text[0] == '\0') return false;
     
     if(regexp[0] == '\\' && regexp[1] != '\0') {
         if(contains_char(text[0], regexp[1])) return match_char(text + 1, regexp + 2);
@@ -30,6 +39,12 @@ bool match_char(const char* text, const char *regexp) {
             return match_char(text + 1,regexp + 2);
 
         return match_char(text + 1, regexp);
+    }
+
+    if(regexp[1] == '?') {
+        if(*text != *regexp) return match_char(text, regexp + 2);
+
+        return match_char(text + 1, regexp + 2);
     }
     
     if(text[0] == regexp[0])
@@ -42,16 +57,13 @@ bool match(const char* text, const char *regexp) {
 
     if(regexp[0] == '\0')
         return false;
-    else if(regexp[0] == '\\') {
-        return match_char(text, regexp);
-    }
-    else if(contains_char(regexp[0], 'w')) {
-        return match_char(text, regexp);
-    }
-    return false;
+
+    return match_char(text, regexp);
 }
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
+    int opt_qnt;
+
     if (pattern.length() == 1) {
         return input_line.find(pattern) != std::string::npos;
     }
@@ -62,6 +74,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
         }
 
         return true;
+    }
+    else if(contains_match_op(pattern)) {
+        return match(&input_line[0], &pattern[0]);
     }
     else if(pattern[0] == '[') {
     	int index = 1;
@@ -89,7 +104,7 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
 
         return true;
     }
-    else if(pattern[0] == '\\' || contains_char(pattern[0], 'w')) {
+    else if(pattern[0] == '\\') {
         return match(&input_line[0], &pattern[0]);
     }
     else {
