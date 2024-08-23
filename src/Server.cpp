@@ -16,14 +16,15 @@ bool contains_char(const char c, const char flag) {
     return false;
 }
 
-bool contains_match_op(const std::string regex) {
+int contains_special_operators(const std::string regex) {
     for(int i = 0; i < regex.length(); ++i) {
-        if(regex[i] == '?') return true;
-        else if(regex[i] == '+') return true;
-        else if(regex[i] == '.') return true;
+        if(regex[i] == '?') return 1;
+        else if(regex[i] == '+') return 1;
+        else if(regex[i] == '.') return 1;
+        else if(regex[i] == '|') return i;
     }
 
-    return false;
+    return 0;
 }
 
 bool match_char(const char* text, const char *regexp) {
@@ -67,6 +68,8 @@ bool match(const char* text, const char *regexp) {
 }
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
+    int alt_index;
+
     if (pattern.length() == 1) {
         return input_line.find(pattern) != std::string::npos;
     }
@@ -78,8 +81,31 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
 
         return true;
     }
-    else if(contains_match_op(pattern)) {
+    else if(contains_special_operators(pattern) == 1) {
         return match(&input_line[0], &pattern[0]);
+    }
+    else if( (alt_index = contains_special_operators(pattern)) > 1) {
+        std::string word1;
+        std::string word2;
+
+        int index = 0;
+        while(pattern[index] != '(') {
+            word1 += pattern[index];
+            word2 += pattern[index];
+
+            ++index;
+        }
+
+        for(int i = index + 1; i < alt_index; ++i) {
+            word1 += pattern[i];
+            index = i;
+        }
+
+        for(int i = index + 2; i < pattern.length() - 1; ++i) {
+            word2 += pattern[i];
+        }
+
+        return (match(&input_line[0], &word1[0])) || (match(&input_line[0], &word2[0]));
     }
     else if(pattern[0] == '[') {
     	int index = 1;
